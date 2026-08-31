@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>بوابة التحقق</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5); width: 350px; }
+        .btn { background: #5865F2; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        .btn:hover { background: #4752C4; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>نظام التحقق المتقدم</h2>
+        <p>قم بتسجيل الدخول للحصول على الرتبة وتأكيد عضويتك.</p>
+        <button class="btn" onclick="window.location.href='/api/auth/discord'">تسجيل الدخول عبر Discord</button>
+    </div>
+</body>
+</html>

@@ -9,7 +9,7 @@ app.use(express.json());
 // تشغيل الملفات من المجلد الرئيسي مباشرة
 app.use(express.static(__dirname));
 
-// بيانات تطبيق Discord (استبدل القيم ببياناتك من Discord Developer Portal)
+// بيانات تطبيق Discord
 const CLIENT_ID = '1542476019091509328';
 const CLIENT_SECRET = 'fEPb5e9lUEqBb2wTgqXoakD7LRz5yVoK';
 const REDIRECT_URI = 'https://stors-ap.onrender.com/api/auth/discord/callback';
@@ -25,13 +25,13 @@ app.get('/api/auth/discord', (req, res) => {
     res.redirect(discordAuthUrl);
 });
 
-// 3. مسار استقبال العودة من Discord (Callback)
+// 3. مسار استقبال العودة من Discord وتوجيهه لصفحة التحقق بالرقم
 app.get('/api/auth/discord/callback', async (req, res) => {
     const code = req.query.code;
     if (!code) return res.send('لم يتم استلام كود التحقق من Discord');
     
-    // هنا يتم معالجة تسجيل الدخول وإعطاء الرتبة للمستخدم
-    res.send('تم تسجيل الدخول بنجاح عبر Discord!');
+    // التوجيه المباشر لصفحة إدخال الرقم
+    res.redirect('/verify.html');
 });
 
 const PORT = process.env.PORT || 10000;

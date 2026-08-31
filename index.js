@@ -6,52 +6,32 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 1. قراءة الملفات الثابتة من المجلد الرئيسي مباشرة
+// تشغيل الملفات من المجلد الرئيسي مباشرة
 app.use(express.static(__dirname));
 
-// تخزين مؤقت للرموز
-const otpStore = new Map();
+// بيانات تطبيق Discord (استبدل القيم ببياناتك من Discord Developer Portal)
+const CLIENT_ID = '1542476019091509328';
+const CLIENT_SECRET = 'fEPb5e9lUEqBb2wTgqXoakD7LRz5yVoK';
+const REDIRECT_URI = 'https://stors-ap.onrender.com/api/auth/discord/callback';
 
-// إعدادات خدمة WhatsApp API
-const ULTRAMSG_INSTANCE_ID = 'instance190163';
-const ULTRAMSG_TOKEN = 'y6sax1c654nkfgkg';
-
-// 2. توجيه الصفحة الرئيسية لفتح index.html تلقائياً
+// 1. الصفحة الرئيسية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 3. مسار إرسال الرمز
-app.post('/api/send-otp', async (req, res) => {
-    const { userId, phone } = req.body;
-
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    if (!phoneRegex.test(phone)) {
-        return res.status(400).json({ success: false, error: 'يرجى إدخال رقم هاتف صحيح مع مفتاح الدولة (مثال: 966501234567+)' });
-    }
-
-    const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-    otpStore.set(userId || phone, generatedOTP);
-
-    try {
-        console.log(`[تجريبي] تم إرسال الرمز ${generatedOTP} إلى الرقم ${phone}`);
-        return res.json({ success: true, message: 'تم إرسال الرمز بنجاح' });
-    } catch (err) {
-        return res.status(500).json({ success: false, error: 'فشل إرسال الرمز، حاول لاحقاً' });
-    }
+// 2. مسار توجيه المستخدم لتسجيل الدخول عبر Discord
+app.get('/api/auth/discord', (req, res) => {
+    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds.join`;
+    res.redirect(discordAuthUrl);
 });
 
-// 4. مسار تأكيد الرمز
-app.post('/api/confirm-otp', (req, res) => {
-    const { userId, otp } = req.body;
-    const storedOTP = otpStore.get(userId);
-
-    if (storedOTP && storedOTP === otp) {
-        otpStore.delete(userId);
-        return res.json({ success: true, message: 'تم التحقق بنجاح' });
-    } else {
-        return res.status(400).json({ success: false, error: 'رمز التحقق غير صحيح' });
-    }
+// 3. مسار استقبال العودة من Discord (Callback)
+app.get('/api/auth/discord/callback', async (req, res) => {
+    const code = req.query.code;
+    if (!code) return res.send('لم يتم استلام كود التحقق من Discord');
+    
+    // هنا يتم معالجة تسجيل الدخول وإعطاء الرتبة للمستخدم
+    res.send('تم تسجيل الدخول بنجاح عبر Discord!');
 });
 
 const PORT = process.env.PORT || 10000;
